@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Bought
+{% endblock %}
+
+{% block main %}
+    <div class="right">
+        <p>Logged in as <span style="color: #7efcd6">{{ username }}</span></p>
+    </div>
+    <p style="color: white">Order successful. Bought {{ shares }} share(s) of {{ company }} ({{ symbol }}) at {{ value }} per share.</p>
+{% endblock %}
