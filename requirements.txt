@@ -2,5 +2,3 @@ flask-sqlalchemy
 Flask
 Flask-Session
 requests
-werkzeug.exceptions
-werkzeug.security
