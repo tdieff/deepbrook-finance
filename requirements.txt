@@ -1,4 +1,4 @@
-splite3
+flask-sqlalchemy
 Flask
 Flask-Session
 requests
