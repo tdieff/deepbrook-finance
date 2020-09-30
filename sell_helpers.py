@@ -1,14 +1,17 @@
-import sqlit3
+from flask_sqlalchemy import SQLAlchemy
 from helpers import lookup, get_position_value, usd
 from flask import request, session
 
-# Configure CS50 Library to use SQLite database
-db = sqlite3.connect('finance.db') 
+# Configure to use SQLite database
+db_name = 'finance.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app) 
 
 def enough_shares(shares):
     symbol = request.form.get("symbol")
     symbol = symbol.upper()
-    rows = db.execute("SELECT SUM(shares) FROM trades WHERE username = :username AND symbol = :symbol GROUP BY symbol", username=session["user_username"], symbol=symbol)
+    rows = db.engine.execute("SELECT SUM(shares) FROM trades WHERE username = :username AND symbol = :symbol GROUP BY symbol", username=session["user_username"], symbol=symbol)
     print(rows)
     if len(rows) > 0:
         shares_owned = int(rows[0]['SUM(shares)'])

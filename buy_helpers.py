@@ -1,9 +1,12 @@
 from flask import redirect, render_template, request, session
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 from helpers import lookup, apology, cash_balance, get_position_value
 
-# Configure CS50 Library to use SQLite database
-db = sqlite3.connect('finance.db') 
+# Configure to use SQLite database
+db_name = 'finance.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app) 
 
 def enough_cash(shares):
     stock_info = lookup(request.form.get("symbol"))
@@ -25,8 +28,8 @@ def place_order(order_type):
         cash += value
     else:
         cash -= value
-    db.execute("UPDATE users SET cash = :cash WHERE id = :user_id", cash=cash, user_id=session["user_id"])
-    db.execute("INSERT INTO trades (username, symbol, price, shares, order_time) VALUES (:username, :symbol, :price, :shares, (SELECT datetime('now')))", username=session["user_username"], symbol=stock_info["symbol"], price=stock_info["price"], shares=shares)
+    db.engine.execute("UPDATE users SET cash = :cash WHERE id = :user_id", cash=cash, user_id=session["user_id"])
+    db.engine.execute("INSERT INTO trades (username, symbol, price, shares, order_time) VALUES (:username, :symbol, :price, :shares, (SELECT datetime('now')))", username=session["user_username"], symbol=stock_info["symbol"], price=stock_info["price"], shares=shares)
     return stock_info, shares
 
 

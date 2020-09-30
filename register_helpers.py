@@ -1,10 +1,14 @@
 import re
 
 from flask import redirect, render_template, request, session
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 
-db = sqlite3.connect('finance.db') 
+# Configure to use SQLite database
+db_name = 'finance.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app) 
 
 
 def username_declared():
@@ -15,7 +19,7 @@ def username_declared():
 
 
 def username_available():
-    entries = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+    entries = db.engine.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
     if len(entries) > 0:
         return False
     else:
@@ -85,5 +89,5 @@ def get_hash():
 def insert_user():
     hashed_password = get_hash()
     username = request.form.get("username")
-    db.execute("INSERT INTO users (id, username, hash) VALUES (NULL, :username, :hashed_password)", username=username, hashed_password=hashed_password)
+    db.engine.execute("INSERT INTO users (id, username, hash) VALUES (NULL, :username, :hashed_password)", username=username, hashed_password=hashed_password)
     return

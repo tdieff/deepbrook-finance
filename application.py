@@ -1,8 +1,8 @@
 import os, re
 
-import sqlite3
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
-from flask_session import Session
+from flask_sqlalchemy import SQLAlchemy
+from flask_session.__init__ import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash
@@ -37,7 +37,10 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure to use SQLite database
-db = sqlit3.connect('finance.db') 
+db_name = 'finance.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app) 
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -73,7 +76,7 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    history = db.execute("SELECT symbol, shares, price, order_time FROM trades WHERE username = :username ORDER BY order_time DESC", username=session["user_username"])
+    history = db.engine.execute("SELECT symbol, shares, price, order_time FROM trades WHERE username = :username ORDER BY order_time DESC", username=session["user_username"])
     for row in history:
         if row['shares'] < 0:
             order_type = 'Sell'
@@ -99,7 +102,7 @@ def login():
         elif not request.form.get("password"):
             return apology("must provide password", 403)
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+        rows = db.engine.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
             return apology("invalid username and/or password", 403)
@@ -193,3 +196,4 @@ def errorhandler(e):
 # Listen for errors
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
+
