@@ -1,6 +1,8 @@
 from flask import redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from helpers import lookup, apology, cash_balance, get_position_value
+from application import app
+
 
 # Configure to use SQLite database
 db_name = 'finance.db'

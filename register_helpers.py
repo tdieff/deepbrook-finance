@@ -4,6 +4,8 @@ from flask import redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 
+from application import app
+
 # Configure to use SQLite database
 db_name = 'finance.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name

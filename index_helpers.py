@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAalchemy
 from helpers import lookup, get_position_value, usd
 from flask import session
+from application import app
 
 # Configure to use SQLite database
 db_name = 'finance.db'
